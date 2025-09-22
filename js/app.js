@@ -40,6 +40,20 @@
     hidden: true
   };
 
+  function setNodeText(node, value) {
+    if (!node) {
+      return;
+    }
+    if (node.textContent !== undefined) {
+      node.textContent = value;
+      return;
+    }
+    while (node.firstChild) {
+      node.removeChild(node.firstChild);
+    }
+    node.appendChild(document.createTextNode(value));
+  }
+
   function startClock() {
     if (!ringDateEl || !ringTimeEl) {
       return;
@@ -47,8 +61,8 @@
     function update() {
       const now = new Date();
       const { dateLabel, timeLabel } = formatDateParts(now);
-      ringDateEl.textContent = dateLabel;
-      ringTimeEl.textContent = timeLabel;
+      setNodeText(ringDateEl, dateLabel);
+      setNodeText(ringTimeEl, timeLabel);
     }
     update();
     setInterval(update, 1000);
@@ -329,7 +343,7 @@
 
   function updateCenterMonth(year, month) {
     if (ringMonthNumberEl) {
-      ringMonthNumberEl.textContent = String(month + 1);
+      setNodeText(ringMonthNumberEl, String(month + 1));
     }
   }
 
