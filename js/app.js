@@ -21,11 +21,20 @@
   const nextBtn = document.getElementById('next');
   const todayBtn = document.getElementById('today');
 
+  const legendPanel = document.querySelector('.legend-panel');
+  const legendToggle = document.getElementById('legend-toggle');
+  const legendSection = document.querySelector('.legend');
+  const appMain = document.querySelector('.app-main');
+
   const state = {
     today: new Date(),
     viewYear: 0,
     viewMonth: 0,
     selectedDate: null
+  };
+
+  const legendState = {
+    hidden: false
   };
 
   function startClock() {
@@ -386,5 +395,35 @@
     startClock();
     initState();
     render();
+    if (legendToggle) {
+      legendToggle.addEventListener('click', () => {
+        legendState.hidden = !legendState.hidden;
+        updateLegendVisibility();
+        render();
+      });
+      updateLegendVisibility();
+    }
   });
+
+  function updateLegendVisibility() {
+    if (!legendPanel || !legendToggle || !appMain) {
+      return;
+    }
+    legendPanel.classList.toggle('is-hidden', legendState.hidden);
+    appMain.classList.toggle('legend-hidden', legendState.hidden);
+    legendToggle.setAttribute('aria-expanded', String(!legendState.hidden));
+    legendToggle.textContent = legendState.hidden ? '凡例を表示' : '凡例を隠す';
+    legendToggle.setAttribute('aria-label', legendState.hidden ? '凡例を表示' : '凡例を隠す');
+    if (legendSection) {
+      if (legendState.hidden) {
+        legendSection.setAttribute('aria-hidden', 'true');
+        legendSection.setAttribute('inert', '');
+        legendSection.hidden = true;
+      } else {
+        legendSection.removeAttribute('aria-hidden');
+        legendSection.removeAttribute('inert');
+        legendSection.hidden = false;
+      }
+    }
+  }
 })();

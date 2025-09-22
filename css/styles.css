@@ -98,6 +98,38 @@ body {
   align-self: start;
 }
 
+.legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.legend-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.legend-toggle {
+  border: 1px solid var(--ring-border);
+  background: white;
+  color: inherit;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.legend-toggle:hover,
+.legend-toggle:focus-visible {
+  background-color: #f0f4ff;
+  outline: none;
+  transform: translateY(-1px);
+}
+
 .legend ul {
   list-style: none;
   margin: 0;
@@ -123,6 +155,49 @@ body {
 .legend-three { background: var(--legend-three); }
 .legend-five { background: var(--legend-five); }
 .legend-seven { background: var(--legend-seven); }
+
+.legend-panel.is-hidden {
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.legend-panel.is-hidden .legend {
+  display: none;
+}
+
+.legend-panel.is-hidden .legend-header {
+  justify-content: flex-end;
+  margin-bottom: 0;
+}
+
+.legend-panel.is-hidden .legend-header h3 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.legend-panel.is-hidden .legend-toggle {
+  background: transparent;
+  border-color: transparent;
+  padding: 0.4rem 0.9rem;
+}
+
+.legend-panel.is-hidden .legend-toggle:hover,
+.legend-panel.is-hidden .legend-toggle:focus-visible {
+  background-color: rgba(240, 244, 255, 0.7);
+  border-color: var(--ring-border);
+}
+
+.app-main.legend-hidden {
+  grid-template-columns: 1fr;
+}
 
 .app-footer {
   font-size: 0.8rem;
@@ -200,6 +275,27 @@ body.dark .controls button:focus-visible {
   background: rgba(255, 255, 255, 0.1);
 }
 
+body.dark .legend-toggle {
+  background: rgba(0, 0, 0, 0.2);
+  color: #f5f5f5;
+}
+
+body.dark .legend-toggle:hover,
+body.dark .legend-toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark .legend-panel.is-hidden .legend-toggle {
+  background: transparent;
+  border-color: transparent;
+}
+
+body.dark .legend-panel.is-hidden .legend-toggle:hover,
+body.dark .legend-panel.is-hidden .legend-toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
 body.dark .app-footer {
   color: rgba(255, 255, 255, 0.7);
 }
@@ -242,6 +338,22 @@ body.dark .day-circle {
   text-anchor: middle;
   dominant-baseline: middle;
   fill: var(--text-muted);
+}
+
+.sub-label.legend-two {
+  fill: var(--legend-two);
+}
+
+.sub-label.legend-three {
+  fill: var(--legend-three);
+}
+
+.sub-label.legend-five {
+  fill: var(--legend-five);
+}
+
+.sub-label.legend-seven {
+  fill: var(--legend-seven);
 }
 
 .today-circle {
