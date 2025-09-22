@@ -322,8 +322,8 @@ svg {
 }
 
 .day-circle {
-  fill: #fff;
-  stroke: rgba(0, 0, 0, 0.08);
+  fill: rgba(255,0,0,0.5);
+  stroke: rgba(0, 0, 0, 1);
   stroke-width: 1;
 }
 
@@ -336,6 +336,7 @@ body.dark .day-circle {
   font-size: clamp(11px, 1.4vw, 13px);
   text-anchor: middle;
   dominant-baseline: middle;
+  font-weight: bold;
 }
 
 .sub-label {
