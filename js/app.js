@@ -17,12 +17,6 @@
   const ringTitle = document.getElementById('ring-title');
   const fallbackList = document.getElementById('fallback-list');
 
-  const detailDateEl = document.getElementById('detail-date');
-  const detailTwoEl = document.getElementById('detail-two');
-  const detailThreeEl = document.getElementById('detail-three');
-  const detailFiveEl = document.getElementById('detail-five');
-  const detailSevenEl = document.getElementById('detail-seven');
-
   const prevBtn = document.getElementById('prev');
   const nextBtn = document.getElementById('next');
   const todayBtn = document.getElementById('today');
@@ -44,9 +38,12 @@
   }
 
   function formatDateTime(date) {
-    const dayOfWeek = sevenCycle[date.getDay()];
     const pad = (n) => String(n).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} (${dayOfWeek}) ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    const delta = deltaDays(date);
+    const cycleStamp = [2, 3, 5, 7]
+      .map((cycle) => cycleLabel(delta, cycle))
+      .join('');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}(${cycleStamp}) ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
 
   function initState() {
@@ -97,10 +94,30 @@
       seven: radius - subStep * 4
     };
 
+    const ringSection = ringContainer.parentElement;
+    if (ringSection) {
+      const sectionRect = ringSection.getBoundingClientRect();
+      const availableWidth = ringSection.clientWidth;
+      const availableHeight = window.innerHeight - sectionRect.top - 56;
+      if (availableWidth > 0) {
+        const widthLimit = Math.max(availableWidth, 0);
+        const heightLimit = availableHeight > 0 ? availableHeight : widthLimit;
+        let ringSize = Math.min(widthLimit, heightLimit);
+        if (!Number.isFinite(ringSize) || ringSize <= 0) {
+          ringSize = widthLimit;
+        }
+        if (ringSize > 0) {
+          ringContainer.style.width = `${ringSize}px`;
+          ringContainer.style.height = `${ringSize}px`;
+        }
+      }
+    }
+
     const svgNS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${svgSize} ${svgSize}`);
     svg.setAttribute('aria-hidden', 'false');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
     // background ring bands
     [
@@ -131,6 +148,7 @@
 
     const pointerGroup = document.createElementNS(svgNS, 'g');
     pointerGroup.setAttribute('class', 'pointer-group');
+    svg.appendChild(pointerGroup);
 
     const fallbackItems = [];
 
@@ -209,9 +227,9 @@
 
       if (day === todayDay) {
         const angle = (2 * Math.PI * ((day - 0.5) / daysInMonth)) - Math.PI / 2;
-        const wedgeWidth = (2 * Math.PI) / daysInMonth * 0.8;
-        const outerRadius = radii.date + 52;
-        const innerRadius = radii.date - 24;
+        const wedgeWidth = (2 * Math.PI) / daysInMonth * 0.95;
+        const outerRadius = radii.date + 56;
+        const innerWrap = Math.max(radii.seven - 8, 0);
 
         const points = [
           {
@@ -219,8 +237,13 @@
             y: center + outerRadius * Math.sin(angle - wedgeWidth / 2)
           },
           {
-            x: center + innerRadius * Math.cos(angle),
-            y: center + innerRadius * Math.sin(angle)
+            x: center + innerWrap * Math.cos(angle - wedgeWidth * 0.18),
+            y: center + innerWrap * Math.sin(angle - wedgeWidth * 0.18)
+          },
+          { x: center, y: center },
+          {
+            x: center + innerWrap * Math.cos(angle + wedgeWidth * 0.18),
+            y: center + innerWrap * Math.sin(angle + wedgeWidth * 0.18)
           },
           {
             x: center + outerRadius * Math.cos(angle + wedgeWidth / 2),
@@ -256,14 +279,19 @@
       });
     }
 
-    svg.appendChild(pointerGroup);
+    const monthLabel = document.createElementNS(svgNS, 'text');
+    monthLabel.setAttribute('class', 'month-label');
+    monthLabel.setAttribute('x', center);
+    monthLabel.setAttribute('y', center);
+    monthLabel.setAttribute('aria-hidden', 'true');
+    monthLabel.textContent = `${month + 1}月`;
+    svg.appendChild(monthLabel);
 
     ringContainer.innerHTML = '';
     ringContainer.appendChild(svg);
     updateRingTitle(year, month);
     renderFallbackList(year, month, fallbackItems);
     updateHash(year, month);
-    updateDetail(state.selectedDate);
   }
 
   function shrinkLabel(label) {
@@ -306,18 +334,7 @@
     const iso = dayGroup.dataset.date;
     const date = new Date(iso);
     state.selectedDate = date;
-    updateDetail(date);
     render();
-  }
-
-  function updateDetail(date) {
-    if (!date) return;
-    const delta = deltaDays(date);
-    detailDateEl.textContent = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    detailTwoEl.textContent = cycleLabel(delta, 2);
-    detailThreeEl.textContent = cycleLabel(delta, 3);
-    detailFiveEl.textContent = cycleLabel(delta, 5);
-    detailSevenEl.textContent = cycleLabel(delta, 7);
   }
 
   function changeMonth(offset) {
