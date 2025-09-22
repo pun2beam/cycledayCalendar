@@ -318,12 +318,7 @@ svg {
 
 .calendar-day {
   cursor: pointer;
-  transition: transform 0.2s ease;
   font-variant-numeric: tabular-nums;
-}
-
-.calendar-day:hover {
-  transform: scale(1.04);
 }
 
 .day-circle {
