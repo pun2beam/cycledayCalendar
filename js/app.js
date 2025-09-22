@@ -242,8 +242,8 @@
       if (day === todayDay) {
         const angle = (2 * Math.PI * ((day - 0.5) / daysInMonth)) - Math.PI / 2;
         const wedgeWidth = (2 * Math.PI) / daysInMonth * 0.95;
-        const outerRadius = radii.date + 56;
-        const weekdayRingRadius = Math.max(radii.seven - 20, 0);
+        const outerRadius = radii.date + 28;
+        const weekdayRingRadius = Math.max(radii.seven - 15, 0);
         const outerOffset = wedgeWidth / 2;
         const innerOffset = wedgeWidth * 0.5;
 
