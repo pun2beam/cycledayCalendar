@@ -250,7 +250,7 @@
       if (day === selectedDay) {
         const outline = document.createElementNS(svgNS, 'circle');
         outline.setAttribute('class', 'selected-outline');
-        outline.setAttribute('r', 22);
+        outline.setAttribute('r', 20);
         outline.setAttribute('cx', 0);
         outline.setAttribute('cy', 0);
         dayGroup.appendChild(outline);
