@@ -1,15 +1,15 @@
 (function () {
   const baseDate = new Date(1980, 0, 1);
-  const twoCycle = ['子', '午'];
-  const threeCycle = ['子', '辰', '申'];
-  const fiveCycle = ['甲', '丙', '戊', '庚', '壬'];
+  const twoCycle = ['陰', '陽'];
+  const threeCycle = ['石', '鋏', '紙'];
+  const fiveCycle = ['風', '雨', '雷', '雲', '霧'];
   const sevenCycle = ['日', '月', '火', '水', '木', '金', '土'];
 
   const cycleMeta = {
-    2: { prefix: '[二]', names: twoCycle },
-    3: { prefix: '[三]', names: threeCycle },
-    5: { prefix: '[五]', names: fiveCycle },
-    7: { prefix: '[七]', names: sevenCycle }
+    2: { names: twoCycle },
+    3: { names: threeCycle },
+    5: { names: fiveCycle },
+    7: { names: sevenCycle }
   };
 
   const nowEl = document.getElementById('now');
@@ -78,7 +78,7 @@
 
   function cycleLabel(delta, n) {
     const idx = cycleIndex(delta, n);
-    return `${cycleMeta[n].prefix}${cycleMeta[n].names[idx]}曜`;
+    return cycleMeta[n].names[idx];
   }
 
   function render() {
@@ -209,21 +209,32 @@
 
       if (day === todayDay) {
         const angle = (2 * Math.PI * ((day - 0.5) / daysInMonth)) - Math.PI / 2;
-        const pointer = document.createElementNS(svgNS, 'line');
-        const pointerLength = radii.date + 36;
-        pointer.setAttribute('x1', center);
-        pointer.setAttribute('y1', center);
-        pointer.setAttribute('x2', center + pointerLength * Math.cos(angle));
-        pointer.setAttribute('y2', center + pointerLength * Math.sin(angle));
-        pointer.setAttribute('class', 'pointer');
-        pointerGroup.appendChild(pointer);
+        const wedgeWidth = (2 * Math.PI) / daysInMonth * 0.8;
+        const outerRadius = radii.date + 52;
+        const innerRadius = radii.date - 24;
 
-        const tip = document.createElementNS(svgNS, 'circle');
-        tip.setAttribute('cx', center + (pointerLength + 6) * Math.cos(angle));
-        tip.setAttribute('cy', center + (pointerLength + 6) * Math.sin(angle));
-        tip.setAttribute('r', 4);
-        tip.setAttribute('class', 'pointer-tip');
-        pointerGroup.appendChild(tip);
+        const points = [
+          {
+            x: center + outerRadius * Math.cos(angle - wedgeWidth / 2),
+            y: center + outerRadius * Math.sin(angle - wedgeWidth / 2)
+          },
+          {
+            x: center + innerRadius * Math.cos(angle),
+            y: center + innerRadius * Math.sin(angle)
+          },
+          {
+            x: center + outerRadius * Math.cos(angle + wedgeWidth / 2),
+            y: center + outerRadius * Math.sin(angle + wedgeWidth / 2)
+          }
+        ];
+
+        const polygon = document.createElementNS(svgNS, 'polygon');
+        polygon.setAttribute(
+          'points',
+          points.map(({ x, y }) => `${x},${y}`).join(' ')
+        );
+        polygon.setAttribute('class', 'pointer-triangle');
+        pointerGroup.appendChild(polygon);
       }
 
       dayGroup.addEventListener('click', handleDaySelection);
@@ -256,12 +267,6 @@
   }
 
   function shrinkLabel(label) {
-    if (window.innerWidth < 360) {
-      return label.replace(/\[(.)\]./, '$1');
-    }
-    if (window.innerWidth < 420) {
-      return label.replace(/\[(.)\]/, '$1:').replace('曜', '');
-    }
     return label;
   }
 

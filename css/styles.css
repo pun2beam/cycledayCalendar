@@ -241,6 +241,17 @@ svg {
   transform: scale(1.04);
 }
 
+.day-circle {
+  fill: #fff;
+  stroke: rgba(0, 0, 0, 0.08);
+  stroke-width: 1;
+}
+
+body.dark .day-circle {
+  fill: #111;
+  stroke: rgba(255, 255, 255, 0.18);
+}
+
 .day-label {
   font-size: clamp(11px, 1.4vw, 13px);
   text-anchor: middle;
@@ -281,14 +292,16 @@ svg {
 .cycle-band.five { stroke: var(--legend-five); }
 .cycle-band.seven { stroke: var(--legend-seven); }
 
-.pointer {
-  stroke: var(--today-color);
-  stroke-width: 3;
-  stroke-linecap: round;
+.pointer-group {
+  pointer-events: none;
 }
 
-.pointer-tip {
+.pointer-triangle {
   fill: var(--today-color);
+  fill-opacity: 0.18;
+  stroke: var(--today-color);
+  stroke-width: 2;
+  stroke-linejoin: round;
 }
 
 .fallback-list {
