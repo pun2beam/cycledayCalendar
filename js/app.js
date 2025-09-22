@@ -9,7 +9,7 @@
     2: { names: twoCycle },
     3: { names: threeCycle },
     5: { names: fiveCycle },
-    7: { names: sevenCycle }
+    7: { names: sevenCycle, isWeekday: true }
   };
 
   const nowEl = document.getElementById('now');
@@ -41,7 +41,7 @@
     const pad = (n) => String(n).padStart(2, '0');
     const delta = deltaDays(date);
     const cycleStamp = [2, 3, 5, 7]
-      .map((cycle) => cycleLabel(delta, cycle))
+      .map((cycle) => cycleLabel(date, delta, cycle))
       .join('');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}(${cycleStamp}) ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
@@ -73,9 +73,13 @@
     return (mod + n) % n;
   }
 
-  function cycleLabel(delta, n) {
+  function cycleLabel(date, delta, n) {
+    const meta = cycleMeta[n];
+    if (meta.isWeekday) {
+      return meta.names[date.getDay()];
+    }
     const idx = cycleIndex(delta, n);
-    return cycleMeta[n].names[idx];
+    return meta.names[idx];
   }
 
   function render() {
@@ -159,10 +163,10 @@
 
       const dateObj = new Date(year, month, day);
       const delta = deltaDays(dateObj);
-      const label2 = cycleLabel(delta, 2);
-      const label3 = cycleLabel(delta, 3);
-      const label5 = cycleLabel(delta, 5);
-      const label7 = cycleLabel(delta, 7);
+      const label2 = cycleLabel(dateObj, delta, 2);
+      const label3 = cycleLabel(dateObj, delta, 3);
+      const label5 = cycleLabel(dateObj, delta, 5);
+      const label7 = cycleLabel(dateObj, delta, 7);
 
       const dayGroup = document.createElementNS(svgNS, 'g');
       dayGroup.setAttribute('transform', `translate(${x}, ${y})`);
@@ -229,25 +233,26 @@
         const angle = (2 * Math.PI * ((day - 0.5) / daysInMonth)) - Math.PI / 2;
         const wedgeWidth = (2 * Math.PI) / daysInMonth * 0.95;
         const outerRadius = radii.date + 56;
-        const innerWrap = Math.max(radii.seven - 8, 0);
+        const weekdayRingRadius = Math.max(radii.seven, 0);
+        const outerOffset = wedgeWidth / 2;
+        const innerOffset = wedgeWidth * 0.28;
 
         const points = [
           {
-            x: center + outerRadius * Math.cos(angle - wedgeWidth / 2),
-            y: center + outerRadius * Math.sin(angle - wedgeWidth / 2)
+            x: center + outerRadius * Math.cos(angle - outerOffset),
+            y: center + outerRadius * Math.sin(angle - outerOffset)
           },
           {
-            x: center + innerWrap * Math.cos(angle - wedgeWidth * 0.18),
-            y: center + innerWrap * Math.sin(angle - wedgeWidth * 0.18)
-          },
-          { x: center, y: center },
-          {
-            x: center + innerWrap * Math.cos(angle + wedgeWidth * 0.18),
-            y: center + innerWrap * Math.sin(angle + wedgeWidth * 0.18)
+            x: center + weekdayRingRadius * Math.cos(angle - innerOffset),
+            y: center + weekdayRingRadius * Math.sin(angle - innerOffset)
           },
           {
-            x: center + outerRadius * Math.cos(angle + wedgeWidth / 2),
-            y: center + outerRadius * Math.sin(angle + wedgeWidth / 2)
+            x: center + weekdayRingRadius * Math.cos(angle + innerOffset),
+            y: center + weekdayRingRadius * Math.sin(angle + innerOffset)
+          },
+          {
+            x: center + outerRadius * Math.cos(angle + outerOffset),
+            y: center + outerRadius * Math.sin(angle + outerOffset)
           }
         ];
 
