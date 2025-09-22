@@ -155,6 +155,7 @@
 
     const svgNS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'ring-calendar-svg');
     svg.setAttribute('viewBox', `0 0 ${svgSize} ${svgSize}`);
     svg.setAttribute('aria-hidden', 'false');
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
@@ -325,7 +326,7 @@
       });
     }
 
-    const existingSvg = ringContainer ? ringContainer.querySelector('svg') : null;
+    const existingSvg = ringContainer ? ringContainer.querySelector('svg.ring-calendar-svg') : null;
     if (existingSvg) {
       existingSvg.remove();
     }
