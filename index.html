@@ -15,7 +15,7 @@
       <button id="next" type="button" aria-label="次の月へ">次月 ▶</button>
     </nav>
   </header>
-  <main class="app-main">
+  <main class="app-main legend-hidden">
     <section class="ring-section" aria-labelledby="ring-heading">
       <h2 id="ring-heading" class="sr-only">環状月暦</h2>
       <div id="ring" class="ring-container" role="img" aria-labelledby="ring-title ring-desc">
@@ -31,14 +31,21 @@
       <p id="ring-desc" class="sr-only">2,3,5,7日周期の曜日を多重に表示する環状カレンダー</p>
       <div id="fallback-list" class="sr-only"></div>
     </section>
-    <aside class="legend-panel" aria-labelledby="legend-heading">
+    <aside class="legend-panel is-hidden" aria-labelledby="legend-heading">
       <div class="legend-header">
         <h3 id="legend-heading">凡例</h3>
-        <button id="legend-toggle" class="legend-toggle" type="button" aria-controls="legend-list" aria-expanded="true">
-          凡例を隠す
+        <button
+          id="legend-toggle"
+          class="legend-toggle"
+          type="button"
+          aria-controls="legend-list"
+          aria-expanded="false"
+          aria-label="凡例を表示"
+        >
+          凡例を表示
         </button>
       </div>
-      <section class="legend" aria-labelledby="legend-heading">
+      <section class="legend" aria-labelledby="legend-heading" aria-hidden="true" inert hidden>
         <ul id="legend-list">
           <li><span class="legend-dot legend-two" aria-hidden="true"></span><span>二日周期: 陰・陽</span></li>
           <li><span class="legend-dot legend-three" aria-hidden="true"></span><span>三日周期: 石・鋏・紙</span></li>
