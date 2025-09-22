@@ -98,13 +98,14 @@
     const svgSize = 600;
     const center = svgSize / 2;
     const radius = svgSize * 0.4;
-    const subStep = 38;
+    const subStep = 19;
+    const subOffset = 19;
     const radii = {
       date: radius,
-      two: radius - subStep,
-      three: radius - subStep * 2,
-      five: radius - subStep * 3,
-      seven: radius - subStep * 4
+      two: radius - subStep - subOffset,
+      three: radius - subStep * 2 - subOffset,
+      five: radius - subStep * 3 - subOffset,
+      seven: radius - subStep * 4 - subOffset
     };
 
     const ringSection = ringContainer.parentElement;
@@ -134,10 +135,10 @@
 
     // background ring bands
     [
-      { radius: radii.date - subStep + 18, className: 'cycle-band two' },
-      { radius: radii.date - subStep * 2 + 18, className: 'cycle-band three' },
-      { radius: radii.date - subStep * 3 + 18, className: 'cycle-band five' },
-      { radius: radii.date - subStep * 4 + 18, className: 'cycle-band seven' }
+      { radius: radii.date - subStep + 18 - subOffset, className: 'cycle-band two' },
+      { radius: radii.date - subStep * 2 + 18 - subOffset, className: 'cycle-band three' },
+      { radius: radii.date - subStep * 3 + 18 - subOffset, className: 'cycle-band five' },
+      { radius: radii.date - subStep * 4 + 18 - subOffset, className: 'cycle-band seven' }
     ].forEach(({ radius: r, className }) => {
       const circle = document.createElementNS(svgNS, 'circle');
       circle.setAttribute('cx', center);
