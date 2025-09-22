@@ -340,7 +340,7 @@ body.dark .day-circle {
 }
 
 .sub-label {
-  font-size: clamp(9px, 1.2vw, 11px);
+  font-size: clamp(12px, 1.4vw, 13px);
   text-anchor: middle;
   dominant-baseline: middle;
   fill: var(--text-muted);
