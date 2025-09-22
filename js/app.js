@@ -99,7 +99,7 @@
     const center = svgSize / 2;
     const radius = svgSize * 0.4;
     const subStep = 19;
-    const subOffset = 19;
+    const subOffset = 10;
     const radii = {
       date: radius,
       two: radius - subStep - subOffset,
