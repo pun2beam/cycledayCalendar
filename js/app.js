@@ -178,8 +178,13 @@
 
     const fallbackItems = [];
 
+    const dayAngle = (day) => {
+      const base = (day - 0.5) / daysInMonth;
+      return 2 * Math.PI * base - Math.PI / 2 + Math.PI / daysInMonth;
+    };
+
     for (let day = 1; day <= daysInMonth; day += 1) {
-      const theta = (2 * Math.PI * ((day - 0.5) / daysInMonth)) - Math.PI / 2;
+      const theta = dayAngle(day);
       const x = center + radii.date * Math.cos(theta);
       const y = center + radii.date * Math.sin(theta);
 
@@ -217,7 +222,7 @@
       ];
 
       subLabels.forEach(({ text, radius: subR, className: legendClass }, index) => {
-        const subTheta = (2 * Math.PI * ((day - 0.5) / daysInMonth)) - Math.PI / 2;
+        const subTheta = dayAngle(day);
         const sx = center + subR * Math.cos(subTheta);
         const sy = center + subR * Math.sin(subTheta);
         const subText = document.createElementNS(svgNS, 'text');
@@ -252,7 +257,7 @@
       }
 
       if (day === todayDay) {
-        const angle = (2 * Math.PI * ((day - 0.5) / daysInMonth)) - Math.PI / 2;
+        const angle = dayAngle(day);
         const wedgeWidth = (2 * Math.PI) / daysInMonth * 0.95;
         const outerRadius = radii.date + 28;
         const weekdayRingRadius = Math.max(radii.seven - 15, 0);
