@@ -134,10 +134,10 @@
 
     // background ring bands
     [
-      { radius: radii.date + 18, className: 'cycle-band two' },
-      { radius: radii.date - subStep + 18, className: 'cycle-band three' },
-      { radius: radii.date - subStep * 2 + 18, className: 'cycle-band five' },
-      { radius: radii.date - subStep * 3 + 18, className: 'cycle-band seven' }
+      { radius: radii.date - subStep + 18, className: 'cycle-band two' },
+      { radius: radii.date - subStep * 2 + 18, className: 'cycle-band three' },
+      { radius: radii.date - subStep * 3 + 18, className: 'cycle-band five' },
+      { radius: radii.date - subStep * 4 + 18, className: 'cycle-band seven' }
     ].forEach(({ radius: r, className }) => {
       const circle = document.createElementNS(svgNS, 'circle');
       circle.setAttribute('cx', center);
