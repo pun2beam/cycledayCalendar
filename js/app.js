@@ -12,8 +12,11 @@
     7: { names: sevenCycle, isWeekday: true }
   };
 
-  const nowEl = document.getElementById('now');
   const ringContainer = document.getElementById('ring');
+  const ringCenter = document.getElementById('ring-center');
+  const ringMonthNumberEl = document.getElementById('ring-month-number');
+  const ringDateEl = document.getElementById('ring-date');
+  const ringTimeEl = document.getElementById('ring-time');
   const ringTitle = document.getElementById('ring-title');
   const fallbackList = document.getElementById('fallback-list');
 
@@ -38,21 +41,29 @@
   };
 
   function startClock() {
+    if (!ringDateEl || !ringTimeEl) {
+      return;
+    }
     function update() {
       const now = new Date();
-      nowEl.textContent = formatDateTime(now);
+      const { dateLabel, timeLabel } = formatDateParts(now);
+      ringDateEl.textContent = dateLabel;
+      ringTimeEl.textContent = timeLabel;
     }
     update();
     setInterval(update, 1000);
   }
 
-  function formatDateTime(date) {
+  function formatDateParts(date) {
     const pad = (n) => String(n).padStart(2, '0');
     const delta = deltaDays(date);
     const cycleStamp = [2, 3, 5, 7]
       .map((cycle) => cycleLabel(date, delta, cycle))
       .join('');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}(${cycleStamp}) ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    return {
+      dateLabel: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}(${cycleStamp})`,
+      timeLabel: `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+    };
   }
 
   function initState() {
@@ -94,6 +105,7 @@
   function render() {
     const year = state.viewYear;
     const month = state.viewMonth;
+    updateCenterMonth(year, month);
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const svgSize = 600;
     const center = svgSize / 2;
@@ -294,29 +306,26 @@
       });
     }
 
-    const monthLabel = document.createElementNS(svgNS, 'text');
-    monthLabel.setAttribute('class', 'month-label');
-    monthLabel.setAttribute('x', center);
-    monthLabel.setAttribute('y', center);
-    monthLabel.setAttribute('aria-hidden', 'true');
-
-    const monthNumber = document.createElementNS(svgNS, 'tspan');
-    monthNumber.setAttribute('class', 'month-number');
-    monthNumber.textContent = String(month + 1);
-    monthLabel.appendChild(monthNumber);
-
-    const monthSuffix = document.createElementNS(svgNS, 'tspan');
-    monthSuffix.setAttribute('class', 'month-suffix');
-    monthSuffix.textContent = '月';
-    monthLabel.appendChild(monthSuffix);
-
-    svg.appendChild(monthLabel);
-
-    ringContainer.innerHTML = '';
-    ringContainer.appendChild(svg);
+    const existingSvg = ringContainer ? ringContainer.querySelector('svg') : null;
+    if (existingSvg) {
+      existingSvg.remove();
+    }
+    if (ringContainer) {
+      if (ringCenter) {
+        ringContainer.insertBefore(svg, ringCenter);
+      } else {
+        ringContainer.appendChild(svg);
+      }
+    }
     updateRingTitle(year, month);
     renderFallbackList(year, month, fallbackItems);
     updateHash(year, month);
+  }
+
+  function updateCenterMonth(year, month) {
+    if (ringMonthNumberEl) {
+      ringMonthNumberEl.textContent = String(month + 1);
+    }
   }
 
   function shrinkLabel(label) {

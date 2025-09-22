@@ -9,8 +9,6 @@
 </head>
 <body>
   <header class="app-header">
-    <h1>魔琉血悶怒曜尾 ― 環状月暦</h1>
-    <p id="now" class="now" aria-live="polite" aria-atomic="true"></p>
     <nav class="controls" aria-label="月移動">
       <button id="prev" type="button" aria-label="前の月へ">◀ 前月</button>
       <button id="today" type="button">今日へ</button>
@@ -20,15 +18,28 @@
   <main class="app-main">
     <section class="ring-section" aria-labelledby="ring-heading">
       <h2 id="ring-heading" class="sr-only">環状月暦</h2>
-      <div id="ring" class="ring-container" role="img" aria-labelledby="ring-title ring-desc"></div>
+      <div id="ring" class="ring-container" role="img" aria-labelledby="ring-title ring-desc">
+        <div id="ring-center" class="ring-center" aria-live="polite" aria-atomic="true">
+          <div class="ring-month" aria-hidden="true">
+            <span id="ring-month-number" class="ring-month-number">1</span><span class="ring-month-unit">月</span>
+          </div>
+          <div id="ring-date" class="ring-date"></div>
+          <div id="ring-time" class="ring-time"></div>
+        </div>
+      </div>
       <p id="ring-title" class="sr-only"></p>
       <p id="ring-desc" class="sr-only">2,3,5,7日周期の曜日を多重に表示する環状カレンダー</p>
       <div id="fallback-list" class="sr-only"></div>
     </section>
     <aside class="legend-panel" aria-labelledby="legend-heading">
-      <section class="legend" aria-labelledby="legend-heading">
+      <div class="legend-header">
         <h3 id="legend-heading">凡例</h3>
-        <ul>
+        <button id="legend-toggle" class="legend-toggle" type="button" aria-controls="legend-list" aria-expanded="true">
+          凡例を隠す
+        </button>
+      </div>
+      <section class="legend" aria-labelledby="legend-heading">
+        <ul id="legend-list">
           <li><span class="legend-dot legend-two" aria-hidden="true"></span><span>二日周期: 陰・陽</span></li>
           <li><span class="legend-dot legend-three" aria-hidden="true"></span><span>三日周期: 石・鋏・紙</span></li>
           <li><span class="legend-dot legend-five" aria-hidden="true"></span><span>五日周期: 風・雨・雷・雲・霧</span></li>
