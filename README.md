@@ -23,7 +23,6 @@
 ```
 .
 ├── index.html        # アプリ本体
-├── 404.html          # GitHub Pages 向けフォールバック（index.html の複製）
 ├── css/
 │   └── styles.css    # レイアウトとスタイル定義
 ├── js/
@@ -59,7 +58,7 @@ npx serve
    - **Source**: `Deploy from a branch`
    - **Branch**: `main`（またはデフォルトブランチ） / `/ (root)`
 3. 設定を保存すると、数十秒後に `https://<ユーザー名>.github.io/<リポジトリ名>/` で公開されます。
-4. 404 対策として `404.html` は `index.html` の複製を配置済みです。
+4. GitHub Actions でデプロイ時に `index.html` を `404.html` に複製して公開します。
 
 ## ライセンス
 
