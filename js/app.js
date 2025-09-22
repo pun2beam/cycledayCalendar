@@ -244,7 +244,7 @@
         const outerRadius = radii.date + 56;
         const weekdayRingRadius = Math.max(radii.seven - 20, 0);
         const outerOffset = wedgeWidth / 2;
-        const innerOffset = wedgeWidth * 0.28;
+        const innerOffset = wedgeWidth * 0.5;
 
         const points = [
           {
