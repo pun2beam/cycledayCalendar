@@ -88,48 +88,52 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
   pointer-events: none;
   width: min(80%, 360px);
 }
 
-.ring-month {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 0.1em;
-  font-size: clamp(3rem, 12vw, 5.5rem);
+.ring-center-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ring-center text {
+  fill: currentColor;
+}
+
+.ring-center-month {
+  font-size: 80px;
   font-weight: 700;
-  line-height: 1;
+  text-anchor: middle;
+  dominant-baseline: middle;
 }
 
-.ring-month-number {
-  font-size: 1em;
+.ring-center-month-number {
   font-variant-numeric: tabular-nums;
 }
 
-.ring-month-unit {
-  font-size: 0.5em;
-  line-height: 1;
+.ring-center-month-unit {
+  font-size: 0.45em;
 }
 
-.ring-date,
-.ring-time {
+.ring-center-date,
+.ring-center-time {
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
-  text-shadow: 0 2px 6px rgba(255, 255, 255, 0.65);
-}
-
-.ring-date {
-  font-size: clamp(1rem, 2.8vw, 1.6rem);
+  text-anchor: middle;
   font-weight: 600;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.65);
+  stroke-width: 4;
+  stroke-linejoin: round;
 }
 
-.ring-time {
-  font-size: clamp(0.95rem, 2.3vw, 1.35rem);
+.ring-center-date {
+  font-size: 22px;
+}
+
+.ring-center-time {
+  font-size: 20px;
   font-weight: 500;
 }
 
@@ -291,9 +295,9 @@ body.dark {
   color: #f5f5f5;
 }
 
-body.dark .ring-date,
-body.dark .ring-time {
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+body.dark .ring-center-date,
+body.dark .ring-center-time {
+  stroke: rgba(0, 0, 0, 0.55);
 }
 
 body.dark .legend-panel {
