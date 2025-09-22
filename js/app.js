@@ -298,7 +298,17 @@
     monthLabel.setAttribute('x', center);
     monthLabel.setAttribute('y', center);
     monthLabel.setAttribute('aria-hidden', 'true');
-    monthLabel.textContent = `${month + 1}月`;
+
+    const monthNumber = document.createElementNS(svgNS, 'tspan');
+    monthNumber.setAttribute('class', 'month-number');
+    monthNumber.textContent = String(month + 1);
+    monthLabel.appendChild(monthNumber);
+
+    const monthSuffix = document.createElementNS(svgNS, 'tspan');
+    monthSuffix.setAttribute('class', 'month-suffix');
+    monthSuffix.textContent = '月';
+    monthLabel.appendChild(monthSuffix);
+
     svg.appendChild(monthLabel);
 
     ringContainer.innerHTML = '';

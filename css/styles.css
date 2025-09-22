@@ -244,11 +244,21 @@ body {
 }
 
 .month-label {
-  font-size: clamp(2.4rem, 7vw, 3.8rem);
+  font-size: clamp(3rem, 8.2vw, 4.6rem);
   font-weight: 700;
   text-anchor: middle;
   dominant-baseline: middle;
   fill: rgba(0, 0, 0, 0.78);
+}
+
+.month-label .month-number {
+  font-size: 1em;
+}
+
+.month-label .month-suffix {
+  font-size: 0.5em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 body.dark .month-label {
