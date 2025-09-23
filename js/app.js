@@ -23,6 +23,7 @@
 
   const ringContainer = document.getElementById('ring');
   const ringCenter = document.getElementById('ring-center');
+  const ringYearEl = document.getElementById('ring-year');
   const ringMonthNumberEl = document.getElementById('ring-month-number');
   const ringDateEl = document.getElementById('ring-date');
   const ringTimeEl = document.getElementById('ring-time');
@@ -646,6 +647,9 @@
   }
 
   function updateCenterMonth(year, month) {
+    if (ringYearEl) {
+      setNodeText(ringYearEl, `${year}年`);
+    }
     if (ringMonthNumberEl) {
       setNodeText(ringMonthNumberEl, String(month + 1));
     }
