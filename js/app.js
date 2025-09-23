@@ -1,16 +1,25 @@
 (function () {
   const baseDate = new Date(1984, 0, 1);
-  const twoCycle = ['陰', '陽'];
-  const threeCycle = ['石', '鋏', '紙'];
-  const fiveCycle = ['風', '雨', '雷', '雲', '霧'];
-  const sevenCycle = ['日', '月', '火', '水', '木', '金', '土'];
+  const cycleOrder = [2, 3, 5, 7];
+  const cycleDescriptors = [
+    { cycle: 2, key: 'two', className: 'legend-two' },
+    { cycle: 3, key: 'three', className: 'legend-three' },
+    { cycle: 5, key: 'five', className: 'legend-five' },
+    { cycle: 7, key: 'seven', className: 'legend-seven' }
+  ];
+  const defaultCycleConfig = Object.freeze({
+    2: ['陰', '陽'],
+    3: ['石', '鋏', '紙'],
+    5: ['風', '雨', '雷', '雲', '霧'],
+    7: ['日', '月', '火', '水', '木', '金', '土']
+  });
+  const SETTINGS_STORAGE_KEY = 'cycledayCalendar.cycleNames';
 
-  const cycleMeta = {
-    2: { names: twoCycle },
-    3: { names: threeCycle },
-    5: { names: fiveCycle },
-    7: { names: sevenCycle }
+  const cycleConfigState = {
+    config: loadCycleConfig()
   };
+
+  let cycleMeta = createCycleMeta(cycleConfigState.config);
 
   const ringContainer = document.getElementById('ring');
   const ringCenter = document.getElementById('ring-center');
@@ -27,7 +36,18 @@
   const legendPanel = document.querySelector('.legend-panel');
   const legendToggle = document.getElementById('legend-toggle');
   const legendSection = document.querySelector('.legend');
+  const legendList = document.getElementById('legend-list');
   const appMain = document.querySelector('.app-main');
+
+  const settingsToggle = document.getElementById('settings-toggle');
+  const settingsPanel = document.getElementById('settings-panel');
+  const settingsClose = document.getElementById('settings-close');
+  const settingsForm = document.getElementById('settings-form');
+  const settingsReset = document.getElementById('settings-reset');
+  const settingsImportInput = document.getElementById('settings-import-input');
+  const settingsExport = document.getElementById('settings-export');
+
+  let isSyncingSettingsForm = false;
 
   const state = {
     today: new Date(),
@@ -39,6 +59,295 @@
   const legendState = {
     hidden: true
   };
+
+  function cloneCycleConfig(source) {
+    return cycleOrder.reduce((acc, cycle) => {
+      acc[cycle] = Array.isArray(source[cycle]) ? [...source[cycle]] : [...defaultCycleConfig[cycle]];
+      return acc;
+    }, {});
+  }
+
+  function createCycleMeta(config) {
+    return cycleOrder.reduce((acc, cycle) => {
+      acc[cycle] = { names: [...config[cycle]] };
+      return acc;
+    }, {});
+  }
+
+  function normalizeCycleConfig(rawConfig) {
+    const normalized = {};
+    cycleOrder.forEach((cycle) => {
+      const defaults = defaultCycleConfig[cycle];
+      const values = Array.isArray(rawConfig?.[cycle]) ? rawConfig[cycle] : [];
+      normalized[cycle] = Array.from({ length: cycle }, (_, index) => {
+        const value = values[index];
+        if (typeof value === 'string' && value.trim()) {
+          return value.trim();
+        }
+        return defaults[index];
+      });
+    });
+    return normalized;
+  }
+
+  function loadCycleConfig() {
+    try {
+      const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      if (!stored) {
+        return cloneCycleConfig(defaultCycleConfig);
+      }
+      const parsed = JSON.parse(stored);
+      return normalizeCycleConfig(parsed);
+    } catch (error) {
+      console.warn('Failed to load cycle settings from localStorage.', error);
+      return cloneCycleConfig(defaultCycleConfig);
+    }
+  }
+
+  function saveCycleConfig(config) {
+    try {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(config));
+    } catch (error) {
+      console.warn('Failed to save cycle settings to localStorage.', error);
+    }
+  }
+
+  function applyCycleConfig(newConfig, { skipSave = false } = {}) {
+    const normalized = normalizeCycleConfig(newConfig);
+    cycleConfigState.config = normalized;
+    cycleMeta = createCycleMeta(normalized);
+    if (!skipSave) {
+      saveCycleConfig(normalized);
+    }
+    syncSettingsFormInputs();
+    renderLegendEntries();
+    render();
+  }
+
+  function syncSettingsFormInputs() {
+    if (!settingsForm) {
+      return;
+    }
+    const inputs = settingsForm.querySelectorAll('input[data-cycle]');
+    if (!inputs.length) {
+      return;
+    }
+    isSyncingSettingsForm = true;
+    inputs.forEach((input) => {
+      const cycle = Number(input.dataset.cycle);
+      const index = Number(input.dataset.index);
+      if (!Number.isFinite(cycle) || !Number.isFinite(index)) {
+        return;
+      }
+      input.value = cycleConfigState.config[cycle][index] || '';
+      input.placeholder = defaultCycleConfig[cycle][index] || '';
+    });
+    isSyncingSettingsForm = false;
+  }
+
+  function renderLegendEntries() {
+    if (!legendList) {
+      return;
+    }
+    legendList.innerHTML = '';
+    cycleDescriptors.forEach(({ cycle, className }) => {
+      const item = document.createElement('li');
+      const dot = document.createElement('span');
+      dot.className = `legend-dot ${className}`;
+      dot.setAttribute('aria-hidden', 'true');
+      const text = document.createElement('span');
+      const names = cycleConfigState.config[cycle] || [];
+      text.textContent = `${cycle}日周期: ${names.join('・')}`;
+      item.appendChild(dot);
+      item.appendChild(text);
+      legendList.appendChild(item);
+    });
+  }
+
+  function buildSettingsForm() {
+    if (!settingsForm) {
+      return;
+    }
+    const help = settingsForm.querySelector('#settings-help');
+    settingsForm.innerHTML = '';
+    if (help) {
+      settingsForm.appendChild(help);
+    }
+    cycleDescriptors.forEach(({ cycle }) => {
+      const fieldset = document.createElement('fieldset');
+      fieldset.className = 'settings-fieldset';
+      const legend = document.createElement('legend');
+      legend.textContent = `${cycle}日周期`;
+      fieldset.appendChild(legend);
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'settings-cycle-inputs';
+
+      for (let index = 0; index < cycle; index += 1) {
+        const row = document.createElement('div');
+        row.className = 'settings-input-row';
+
+        const label = document.createElement('label');
+        const inputId = `settings-${cycle}-${index}`;
+        label.setAttribute('for', inputId);
+        label.textContent = `${index + 1}日目`;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = inputId;
+        input.dataset.cycle = String(cycle);
+        input.dataset.index = String(index);
+        input.placeholder = defaultCycleConfig[cycle][index] || '';
+        input.value = cycleConfigState.config[cycle][index] || '';
+        input.addEventListener('change', handleSettingsInput);
+
+        row.appendChild(label);
+        row.appendChild(input);
+        wrapper.appendChild(row);
+      }
+
+      fieldset.appendChild(wrapper);
+      settingsForm.appendChild(fieldset);
+    });
+
+    settingsForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+    });
+  }
+
+  function handleSettingsInput(event) {
+    if (isSyncingSettingsForm) {
+      return;
+    }
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+    const cycle = Number(target.dataset.cycle);
+    const index = Number(target.dataset.index);
+    if (!Number.isFinite(cycle) || !Number.isFinite(index)) {
+      return;
+    }
+    const rawValue = target.value;
+    const normalizedValue = rawValue && rawValue.trim() ? rawValue.trim() : defaultCycleConfig[cycle][index];
+    const nextConfig = cloneCycleConfig(cycleConfigState.config);
+    nextConfig[cycle][index] = normalizedValue;
+    applyCycleConfig(nextConfig);
+    if (target.value !== normalizedValue) {
+      isSyncingSettingsForm = true;
+      target.value = normalizedValue;
+      isSyncingSettingsForm = false;
+    }
+  }
+
+  function setSettingsVisibility(visible) {
+    if (!settingsPanel || !settingsToggle) {
+      return;
+    }
+    if (visible) {
+      settingsPanel.removeAttribute('hidden');
+    } else {
+      settingsPanel.setAttribute('hidden', '');
+    }
+    settingsToggle.setAttribute('aria-expanded', String(visible));
+    settingsToggle.setAttribute('aria-label', visible ? '曜日設定を閉じる' : '曜日設定を開く');
+  }
+
+  function focusFirstSettingsInput() {
+    if (!settingsPanel) {
+      return;
+    }
+    const input = settingsPanel.querySelector('input[data-cycle]');
+    if (input) {
+      input.focus();
+    }
+  }
+
+  function initializeSettingsUI() {
+    if (!settingsForm) {
+      return;
+    }
+    buildSettingsForm();
+    syncSettingsFormInputs();
+
+    if (settingsToggle) {
+      setSettingsVisibility(false);
+      settingsToggle.addEventListener('click', () => {
+        const isHidden = settingsPanel ? settingsPanel.hasAttribute('hidden') : true;
+        setSettingsVisibility(isHidden);
+        if (isHidden) {
+          focusFirstSettingsInput();
+        }
+      });
+    }
+
+    if (settingsClose) {
+      settingsClose.addEventListener('click', () => {
+        setSettingsVisibility(false);
+        if (settingsToggle) {
+          settingsToggle.focus();
+        }
+      });
+    }
+
+    if (settingsReset) {
+      settingsReset.addEventListener('click', () => {
+        applyCycleConfig(cloneCycleConfig(defaultCycleConfig));
+      });
+    }
+
+    if (settingsImportInput) {
+      settingsImportInput.addEventListener('change', handleImportChange);
+    }
+
+    if (settingsExport) {
+      settingsExport.addEventListener('click', handleExportClick);
+    }
+  }
+
+  function handleImportChange(event) {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || !input.files || input.files.length === 0) {
+      return;
+    }
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = typeof reader.result === 'string' ? reader.result : '';
+        const parsed = JSON.parse(text);
+        applyCycleConfig(parsed);
+      } catch (error) {
+        console.error('Failed to import cycle settings.', error);
+        window.alert('設定ファイルの読み込みに失敗しました。JSON形式を確認してください。');
+      } finally {
+        input.value = '';
+      }
+    };
+    reader.onerror = () => {
+      console.error('Failed to import cycle settings.', reader.error);
+      window.alert('設定ファイルの読み込みに失敗しました。再度お試しください。');
+      input.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  function handleExportClick() {
+    const data = JSON.stringify(cycleConfigState.config, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+    anchor.href = url;
+    anchor.download = `cycle-settings_${timestamp}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
 
   function setNodeText(node, value) {
     if (!node) {
@@ -71,7 +380,7 @@
   function formatDateParts(date) {
     const pad = (n) => String(n).padStart(2, '0');
     const delta = deltaDays(date);
-    const cycleStamp = [2, 3, 5, 7]
+    const cycleStamp = cycleOrder
       .map((cycle) => cycleLabel(delta, cycle))
       .join('');
     return {
@@ -110,7 +419,10 @@
   function cycleLabel(delta, n) {
     const meta = cycleMeta[n];
     const idx = cycleIndex(delta, n);
-    return meta.names[idx];
+    if (!meta || !Array.isArray(meta.names)) {
+      return String(idx + 1);
+    }
+    return meta.names[idx] ?? String(idx + 1);
   }
 
   function render() {
@@ -202,10 +514,10 @@
 
       const dateObj = new Date(year, month, day);
       const delta = deltaDays(dateObj);
-      const label2 = cycleLabel(delta, 2);
-      const label3 = cycleLabel(delta, 3);
-      const label5 = cycleLabel(delta, 5);
-      const label7 = cycleLabel(delta, 7);
+      const dayCycles = {};
+      cycleDescriptors.forEach(({ cycle }) => {
+        dayCycles[cycle] = cycleLabel(delta, cycle);
+      });
 
       const dayGroup = document.createElementNS(svgNS, 'g');
       dayGroup.setAttribute('transform', `translate(${x}, ${y})`);
@@ -215,33 +527,27 @@
       dayGroup.setAttribute('aria-pressed', String(day === selectedDay));
       dayGroup.dataset.day = day;
       dayGroup.dataset.date = dateObj.toISOString();
-      dayGroup.dataset.cycles = JSON.stringify({
-        two: label2,
-        three: label3,
-        five: label5,
-        seven: label7
-      });
+      const cycleDataset = cycleDescriptors.reduce((acc, descriptor) => {
+        acc[descriptor.key] = dayCycles[descriptor.cycle];
+        return acc;
+      }, {});
+      dayGroup.dataset.cycles = JSON.stringify(cycleDataset);
 
       const title = document.createElementNS(svgNS, 'title');
-      title.textContent = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')} ${label2}, ${label3}, ${label5}, ${label7}`;
+      const cycleSummary = cycleOrder.map((cycle) => dayCycles[cycle]).join(', ');
+      title.textContent = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')} ${cycleSummary}`;
       dayGroup.appendChild(title);
 
-      const subLabels = [
-        { text: label2, radius: radii.two, className: 'legend-two' },
-        { text: label3, radius: radii.three, className: 'legend-three' },
-        { text: label5, radius: radii.five, className: 'legend-five' },
-        { text: label7, radius: radii.seven, className: 'legend-seven' }
-      ];
-
-      subLabels.forEach(({ text, radius: subR, className: legendClass }, index) => {
+      cycleDescriptors.forEach(({ cycle, key, className }) => {
         const subTheta = dayAngle(day);
-        const sx = center + subR * Math.cos(subTheta);
-        const sy = center + subR * Math.sin(subTheta);
+        const subRadius = radii[key];
+        const sx = center + subRadius * Math.cos(subTheta);
+        const sy = center + subRadius * Math.sin(subTheta);
         const subText = document.createElementNS(svgNS, 'text');
         subText.setAttribute('x', sx);
         subText.setAttribute('y', sy);
-        subText.setAttribute('class', `sub-label ${legendClass}`);
-        subText.textContent = shrinkLabel(text);
+        subText.setAttribute('class', `sub-label ${className}`);
+        subText.textContent = shrinkLabel(dayCycles[cycle]);
         svg.appendChild(subText);
       });
 
@@ -316,10 +622,10 @@
 
       fallbackItems.push({
         day,
-        label2,
-        label3,
-        label5,
-        label7
+        labels: cycleDescriptors.reduce((acc, descriptor) => {
+          acc[descriptor.cycle] = dayCycles[descriptor.cycle];
+          return acc;
+        }, {})
       });
     }
 
@@ -362,9 +668,12 @@
     listWrapper.appendChild(heading);
 
     const list = document.createElement('ul');
-    items.forEach(({ day, label2, label3, label5, label7 }) => {
+    items.forEach(({ day, labels }) => {
       const item = document.createElement('li');
-      item.textContent = `${String(day).padStart(2, '0')}日: ${label2} / ${label3} / ${label5} / ${label7}`;
+      const labelText = cycleDescriptors
+        .map(({ cycle }) => labels[cycle])
+        .join(' / ');
+      item.textContent = `${String(day).padStart(2, '0')}日: ${labelText}`;
       list.appendChild(item);
     });
 
@@ -431,6 +740,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     startClock();
     initState();
+    initializeSettingsUI();
+    renderLegendEntries();
     render();
     if (legendToggle) {
       legendToggle.addEventListener('click', () => {

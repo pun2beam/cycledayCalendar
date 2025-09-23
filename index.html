@@ -9,12 +9,44 @@
 </head>
 <body>
   <header class="app-header">
-    <nav class="controls" aria-label="月移動">
-      <button id="prev" type="button" aria-label="前の月へ">◀ 前月</button>
-      <button id="today" type="button">今日へ</button>
-      <button id="next" type="button" aria-label="次の月へ">次月 ▶</button>
-    </nav>
+    <div class="header-controls">
+      <nav class="controls" aria-label="月移動">
+        <button id="prev" type="button" aria-label="前の月へ">◀ 前月</button>
+        <button id="today" type="button">今日へ</button>
+        <button id="next" type="button" aria-label="次の月へ">次月 ▶</button>
+      </nav>
+    </div>
   </header>
+  <section
+    id="settings-panel"
+    class="settings-panel"
+    hidden
+    aria-labelledby="settings-heading"
+  >
+    <div class="settings-inner">
+      <div class="settings-header">
+        <h2 id="settings-heading">周期の曜日設定</h2>
+        <button id="settings-close" class="settings-close" type="button" aria-controls="settings-panel">
+          閉じる
+        </button>
+      </div>
+      <form id="settings-form" class="settings-form" aria-describedby="settings-help">
+        <p id="settings-help" class="settings-help">
+          各周期ごとの表示名を設定できます。空欄にすると既定値に戻ります。
+        </p>
+      </form>
+      <div class="settings-actions">
+        <button id="settings-reset" class="settings-reset" type="button">既定値に戻す</button>
+        <div class="settings-import-export">
+          <label class="settings-import">
+            <span>設定をインポート</span>
+            <input id="settings-import-input" type="file" accept="application/json" />
+          </label>
+          <button id="settings-export" class="settings-export" type="button">設定をエクスポート</button>
+        </div>
+      </div>
+    </div>
+  </section>
   <main class="app-main legend-hidden">
     <section class="ring-section" aria-labelledby="ring-heading">
       <h2 id="ring-heading" class="sr-only">環状月暦</h2>
@@ -54,12 +86,18 @@
         </button>
       </div>
       <section class="legend" aria-labelledby="legend-heading" aria-hidden="true" inert hidden>
-        <ul id="legend-list">
-          <li><span class="legend-dot legend-two" aria-hidden="true"></span><span>二日周期: 陰・陽</span></li>
-          <li><span class="legend-dot legend-three" aria-hidden="true"></span><span>三日周期: 石・鋏・紙</span></li>
-          <li><span class="legend-dot legend-five" aria-hidden="true"></span><span>五日周期: 風・雨・雷・雲・霧</span></li>
-          <li><span class="legend-dot legend-seven" aria-hidden="true"></span><span>七日周期: 日・月・火・水・木・金・土</span></li>
-        </ul>
+        <div class="legend-settings">
+          <button
+            id="settings-toggle"
+            class="settings-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="settings-panel"
+          >
+            曜日設定
+          </button>
+        </div>
+        <ul id="legend-list"></ul>
       </section>
     </aside>
   </main>
