@@ -27,9 +27,12 @@ body {
   text-align: center;
 }
 
-.app-header h1 {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.5rem, 3vw + 1rem, 2.5rem);
+.header-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .controls {
@@ -48,8 +51,158 @@ body {
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
+.settings-toggle,
+.settings-close,
+.settings-reset,
+.settings-export {
+  border: 1px solid var(--ring-border);
+  background: white;
+  color: inherit;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
 .controls button:hover,
 .controls button:focus-visible {
+  background-color: #f0f4ff;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.settings-panel {
+  padding: 0 1.5rem 1rem;
+}
+
+.settings-panel[hidden] {
+  display: none;
+}
+
+.settings-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  background: rgba(247, 247, 247, 0.85);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.settings-close {
+  font-size: 0.85rem;
+}
+
+.settings-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.settings-help {
+  margin: 0 0 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.settings-fieldset {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0;
+}
+
+.settings-fieldset legend {
+  padding: 0 0.5rem;
+  font-weight: 600;
+}
+
+.settings-cycle-inputs {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.settings-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 120px) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.settings-input-row label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.settings-input-row input {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--ring-border);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.settings-input-row input:focus-visible {
+  outline: 2px solid #4f83ff;
+  outline-offset: 2px;
+}
+
+.settings-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-import-export {
+  display: inline-flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.settings-import {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.settings-import span {
+  border: 1px dashed var(--ring-border);
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+}
+
+.settings-import input {
+  display: none;
+}
+
+.settings-toggle:hover,
+.settings-toggle:focus-visible,
+.settings-close:hover,
+.settings-close:focus-visible,
+.settings-reset:hover,
+.settings-reset:focus-visible,
+.settings-export:hover,
+.settings-export:focus-visible {
   background-color: #f0f4ff;
   outline: none;
   transform: translateY(-1px);
@@ -186,6 +339,12 @@ body {
   gap: 0.5rem;
 }
 
+.legend-settings {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
 .legend li {
   display: flex;
   align-items: center;
@@ -266,6 +425,10 @@ body {
 }
 
 @media (max-width: 960px) {
+  .settings-inner {
+    padding: 1.25rem;
+  }
+
   .app-main {
     grid-template-columns: 1fr;
   }
@@ -281,6 +444,10 @@ body {
     --ring-size: min(95vw, 420px);
   }
 
+  .header-controls {
+    flex-direction: column;
+  }
+
   .controls {
     flex-wrap: wrap;
     justify-content: center;
@@ -288,6 +455,16 @@ body {
 
   .controls button {
     flex: 1 0 30%;
+  }
+
+  .settings-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-import-export {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
@@ -314,6 +491,40 @@ body.dark .controls button {
 body.dark .controls button:hover,
 body.dark .controls button:focus-visible {
   background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark .settings-toggle,
+body.dark .settings-close,
+body.dark .settings-reset,
+body.dark .settings-export {
+  background: rgba(0, 0, 0, 0.2);
+  color: #f5f5f5;
+}
+
+body.dark .settings-toggle:hover,
+body.dark .settings-toggle:focus-visible,
+body.dark .settings-close:hover,
+body.dark .settings-close:focus-visible,
+body.dark .settings-reset:hover,
+body.dark .settings-reset:focus-visible,
+body.dark .settings-export:hover,
+body.dark .settings-export:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark .settings-inner {
+  background: rgba(20, 30, 55, 0.85);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+body.dark .settings-input-row input {
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark .settings-import span {
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 body.dark .legend-toggle {
