@@ -256,6 +256,14 @@ body {
   fill: currentColor;
 }
 
+.ring-center-year {
+  font-size: 28px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: alphabetic;
+  opacity: 0.75;
+}
+
 .ring-center-month {
   font-size: 120px;
   font-weight: 700;
