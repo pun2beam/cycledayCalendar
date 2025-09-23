@@ -1,5 +1,5 @@
 (function () {
-  const baseDate = new Date(1980, 0, 1);
+  const baseDate = new Date(1984, 0, 1);
   const twoCycle = ['陰', '陽'];
   const threeCycle = ['石', '鋏', '紙'];
   const fiveCycle = ['風', '雨', '雷', '雲', '霧'];
@@ -9,7 +9,7 @@
     2: { names: twoCycle },
     3: { names: threeCycle },
     5: { names: fiveCycle },
-    7: { names: sevenCycle, isWeekday: true }
+    7: { names: sevenCycle }
   };
 
   const ringContainer = document.getElementById('ring');
@@ -72,7 +72,7 @@
     const pad = (n) => String(n).padStart(2, '0');
     const delta = deltaDays(date);
     const cycleStamp = [2, 3, 5, 7]
-      .map((cycle) => cycleLabel(date, delta, cycle))
+      .map((cycle) => cycleLabel(delta, cycle))
       .join('');
     return {
       dateLabel: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}(${cycleStamp})`,
@@ -107,11 +107,8 @@
     return (mod + n) % n;
   }
 
-  function cycleLabel(date, delta, n) {
+  function cycleLabel(delta, n) {
     const meta = cycleMeta[n];
-    if (meta.isWeekday) {
-      return meta.names[date.getDay()];
-    }
     const idx = cycleIndex(delta, n);
     return meta.names[idx];
   }
@@ -205,10 +202,10 @@
 
       const dateObj = new Date(year, month, day);
       const delta = deltaDays(dateObj);
-      const label2 = cycleLabel(dateObj, delta, 2);
-      const label3 = cycleLabel(dateObj, delta, 3);
-      const label5 = cycleLabel(dateObj, delta, 5);
-      const label7 = cycleLabel(dateObj, delta, 7);
+      const label2 = cycleLabel(delta, 2);
+      const label3 = cycleLabel(delta, 3);
+      const label5 = cycleLabel(delta, 5);
+      const label7 = cycleLabel(delta, 7);
 
       const dayGroup = document.createElementNS(svgNS, 'g');
       dayGroup.setAttribute('transform', `translate(${x}, ${y})`);
